@@ -41,11 +41,12 @@ EVALUATE
 	SUMMARIZECOLUMNS(
 		Reservations[agent],
 		FILTER(Reservations, NOT ISBLANK(Reservations[agent])),
-		"Reservations", [Total Reservations],
+		"Booking Volume", [Total Reservations],
 		"% of Total", ROUND(
 						DIVIDE(
 							[Total Reservations],
 							CALCULATE([Total Reservations], ALL(), NOT ISBLANK(Reservations[agent]))) * 100,
 							3
-						)
+						),
+		"Produced Income", [Income]
 	)
