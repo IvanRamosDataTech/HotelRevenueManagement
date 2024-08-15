@@ -34,3 +34,6 @@ For time intelligence convenience, I had to add a calulated column booking_date,
 Added a calculated column called total_rate which represents total amount paid for a reservation
     `(stays_in_week_nights + stays_in_weekend_nights) * avg_daily_rate`
 
+## Other intriguing findings
+
+While I was calculating total income for business, I played around with is_cancelled, deposity_type and reservation_status. I found 3 observations that seem to be incongruent, because they were cancelled , but also has status as Check-out. 

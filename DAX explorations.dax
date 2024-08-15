@@ -26,3 +26,26 @@ EVALUATE
 	
 EVALUATE
 	{CALCULATE(COUNT(Reservations[market_segment]), Reservations[market_segment] = "Offline TA")}
+	
+------------------------------------------
+-- Agents
+------------------------------------------
+
+
+-- How many agents work with us?
+EVALUATE
+	{COUNTX(DISTINCT(Reservations[agent]), [agent])}
+	
+-- How are reservations distributed by agent?
+EVALUATE
+	SUMMARIZECOLUMNS(
+		Reservations[agent],
+		FILTER(Reservations, NOT ISBLANK(Reservations[agent])),
+		"Reservations", [Total Reservations],
+		"% of Total", ROUND(
+						DIVIDE(
+							[Total Reservations],
+							CALCULATE([Total Reservations], ALL(), NOT ISBLANK(Reservations[agent]))) * 100,
+							3
+						)
+	)
