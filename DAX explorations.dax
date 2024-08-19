@@ -12,8 +12,6 @@ EVALUATE
 		Reservations[total_rate])
 	
 
-EVALUATE
-	ALL(Reservations[meal])
 	
 -- Explore marketing segment discounts over total
 EVALUATE
@@ -21,11 +19,11 @@ EVALUATE
 		Reservations,
 		Reservations[market_segment],
 		RELATED(MarketSegment[Discount]),
+		Reservations[avg_daily_rate],
+		Reservations[total_stay_nights],
+		Reservations[accomodation_rate],
 		Reservations[total_rate]
 	)
-	
-EVALUATE
-	{CALCULATE(COUNT(Reservations[market_segment]), Reservations[market_segment] = "Offline TA")}
 	
 ------------------------------------------
 -- Agents
@@ -48,5 +46,10 @@ EVALUATE
 							CALCULATE([Total Reservations], ALL(), NOT ISBLANK(Reservations[agent]))) * 100,
 							3
 						),
-		"Produced Income", [Income]
+		"Produced Income", IF(ISBLANK([Income]), 0, [Income]),
+		"Booking Effectiveness %", ROUND(
+						DIVIDE([Total Reservations] - [Cancelled Reservations],
+								[Total Reservations]) * 100,
+							2
+						)
 	)
