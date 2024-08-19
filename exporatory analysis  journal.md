@@ -2,7 +2,8 @@
 
 - [x] Establish assumptions
 - [x] Calculate Basic metrics around reservations
-- [ ] Perform univariate data exploration
+- [ ] Agents performance exploration
+    - [ ] Perform univariate data exploration
 - [ ] Perform bivariate data exploration
 - [ ] Perform multivariate data exploration
 - [ ] Explore booking volume over time
@@ -34,8 +35,22 @@ For time intelligence convenience, I had to add a calulated column booking_date,
 Added a calculated column called total_rate which represents total amount paid for a reservation
     `(stays_in_week_nights + stays_in_weekend_nights) * avg_daily_rate`
 
+
+## Agents performance exploration
+
+### Problem statement
+    The cost of having an agent is getting too high, we are paying 25% commision rate to agents. We need to reduce agent cost by 15%, which agents would you recommend us to stop collaboration with?
+
+ so I performed some calculations that could help to evaluate agent's performance:
+1. **Produced Income**. Most important from my perspective, describes how much earnings represent for company. Only checked out reservations
+2. **Booking Effectivenes**. A secondary parameter that shows ratio of checked out bookings / total bookings per agent. 
+3. **Booking Volume**. A third less important parameter considered. It's less important in my opinion because more bookings does not necessarily imply better bookings (ones with high profits or that end up with checkouts) 
+
+Metrics could be influenced by how long agents have worked for the company. It's not fair to evaluate an agent with 10 reservations achieved in 3 months than another agent with 10 reservations achieved in a year. Unfortunately, we don't have enough information to measure this fact. 
+
+
 ## Other intriguing findings
 
-While I was calculating total income for business, I played around with is_cancelled, deposity_type and reservation_status. I found 3 observations that seem to be incongruent, because they were cancelled , but also has status as Check-out. 
+While I was calculating total income for business, I played around with is_cancelled, deposity_type and reservation_status. I found 47 observations that seem to be incongruent, because they were cancelled , but also has status as Check-out. 
 
 Some bookings end up with $0.00 rate. This is because some of them have 0 reported stay_nights, some others have 0 people (Some corporates), or simply avg_daily_rate is 0.

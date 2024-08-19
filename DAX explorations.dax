@@ -39,20 +39,29 @@ EVALUATE
 	SUMMARIZECOLUMNS(
 		Reservations[agent],
 		FILTER(Reservations, NOT ISBLANK(Reservations[agent])),
-		"Booking Volume", [Total Reservations],
-		"% of Total", ROUND(
+		"Produced Income", ROUND(IF(ISBLANK([Income]), 0, [Income]), 2),
+		"% Income", 
+					ROUND(
 						DIVIDE(
-							[Total Reservations],
-							CALCULATE([Total Reservations], ALL(), NOT ISBLANK(Reservations[agent]))) * 100,
-							3
-						),
-		"Produced Income", IF(ISBLANK([Income]), 0, [Income]),
+							[Income],
+							CALCULATE([Income], ALL())
+						) * 100,
+						3
+					),
 		"Booking Effectiveness %", ROUND(
 						DIVIDE([Total Reservations] - [Cancelled Reservations],
 								[Total Reservations]) * 100,
 							2
 						),
-		"Earned Comissions", [Agent Comissions]
+		"Booking Volume", [Total Reservations],
+		"% Volume", ROUND(
+						DIVIDE(
+							[Total Reservations],
+							CALCULATE([Total Reservations], ALL(), NOT ISBLANK(Reservations[agent]))
+						) * 100,
+						3
+					),
+		"Earned Comissions", ROUND([Agent Comissions], 2)
 	)
 	
 // Just getting random sample to verify agent_comission calculation
