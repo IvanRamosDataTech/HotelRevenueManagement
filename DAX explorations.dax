@@ -51,5 +51,18 @@ EVALUATE
 						DIVIDE([Total Reservations] - [Cancelled Reservations],
 								[Total Reservations]) * 100,
 							2
-						)
+						),
+		"Earned Comissions", [Agent Comissions]
 	)
+	
+// Just getting random sample to verify agent_comission calculation
+EVALUATE
+	SAMPLE(10, 
+			SELECTCOLUMNS(Reservations,
+				Reservations[is_canceled],
+				Reservations[reservation_status],
+				Reservations[agent],
+				Reservations[accomodation_rate],
+				Reservations[agent_comission]),
+			RAND()
+		)
