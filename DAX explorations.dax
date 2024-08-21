@@ -40,27 +40,10 @@ EVALUATE
 		Reservations[agent],
 		FILTER(Reservations, NOT ISBLANK(Reservations[agent])),
 		"Produced Income", ROUND(IF(ISBLANK([Income]), 0, [Income]), 2),
-		"% Income", 
-					ROUND(
-						DIVIDE(
-							[Income],
-							CALCULATE([Income], ALL())
-						) * 100,
-						3
-					),
-		"Booking Effectiveness %", ROUND(
-						DIVIDE([Total Reservations] - [Cancelled Reservations],
-								[Total Reservations]) * 100,
-							2
-						),
+		"Income %", [Income %],
+		"Booking Effectiveness %", ROUND([Booking Effectivenes %] * 100, 2),
 		"Booking Volume", [Total Reservations],
-		"% Volume", ROUND(
-						DIVIDE(
-							[Total Reservations],
-							CALCULATE([Total Reservations], ALL(), NOT ISBLANK(Reservations[agent]))
-						) * 100,
-						3
-					),
+		"Volume %", ROUND([Booking Volume %], 3),
 		"Earned Comissions", ROUND([Agent Comissions], 2)
 	)
 	
@@ -75,3 +58,25 @@ EVALUATE
 				Reservations[agent_comission]),
 			RAND()
 		)
+		
+EVALUATE
+	// Ranking is based on following criteria:
+	// 1. Produced Income % - 80% weight
+	// 2. Booking Effectiveness % - 15% weight
+	// 3. Booking Volume % - 5% weight
+
+	VAR AgentsRanking = 
+		ADDCOLUMNS(
+			VALUES(Reservations[agent]),
+			"Income%", ROUND([Income %] * 100, 2),
+			"Effectiveness%", ROUND([Booking Effectivenes %] * 100, 2),
+			"Volume%", ROUND([Booking Volume %] * 100, 2)
+		)
+		
+	RETURN ADDCOLUMNS(
+		AgentsRanking,
+		"Rank", RANKX(AgentsRanking, [Income%] * 0.80 + [Effectiveness%] * 0.15 + [Volume%] * 0.05)
+	)
+	
+	ORDER BY [Rank]
+	
