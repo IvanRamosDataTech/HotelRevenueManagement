@@ -39,11 +39,23 @@ EVALUATE
 	SUMMARIZECOLUMNS(
 		Reservations[agent],
 		FILTER(Reservations, NOT ISBLANK(Reservations[agent])),
-		"Produced Income", ROUND(IF(ISBLANK([Income]), 0, [Income]), 2),
-		"Income %", [Income %],
-		"Booking Effectiveness %", ROUND([Booking Effectivenes %] * 100, 2),
-		"Booking Volume", [Total Reservations],
-		"Volume %", ROUND([Booking Volume %], 3),
+		"Produced Income", ROUND(COALESCE([Income], 0), 2),
+		"Income %", ROUND(
+						COALESCE(
+							 DIVIDE([Income], CALCULATE([Income], ALL(), NOT ISBLANK(Reservations[agent]))),
+							 0
+						 ) * 100,
+					 	 2
+					 ),
+		"Booking Effectiveness %", ROUND(
+										[Booking Effectivenes %] * 100,
+										2
+									),
+		"Booking Volume", [Reservations],
+		"Volume %", ROUND(
+						DIVIDE([Reservations], CALCULATE([Reservations], ALL(), NOT ISBLANK(Reservations[agent]))) * 100,
+						3
+					),
 		"Earned Comissions", ROUND([Agent Comissions], 2)
 	)
 	
@@ -68,7 +80,13 @@ EVALUATE
 	VAR AgentsRanking = 
 		ADDCOLUMNS(
 			VALUES(Reservations[agent]),
-			"Income%", ROUND([Income %] * 100, 2),
+			"Income%", ROUND(
+						COALESCE(
+							 DIVIDE([Income], CALCULATE([Income], ALL(), NOT ISBLANK(Reservations[agent]))),
+							 0
+						 ) * 100,
+					 	 2
+					 ),
 			"Effectiveness%", ROUND([Booking Effectivenes %] * 100, 2),
 			"Volume%", ROUND([Booking Volume %] * 100, 2)
 		)
