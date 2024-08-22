@@ -79,16 +79,20 @@ EVALUATE
 
 	VAR AgentsRanking = 
 		ADDCOLUMNS(
-			VALUES(Reservations[agent]),
+			CALCULATETABLE(VALUES(Reservations[agent]), NOT ISBLANK(Reservations[agent])),
 			"Income%", ROUND(
-						COALESCE(
-							 DIVIDE([Income], CALCULATE([Income], ALL(), NOT ISBLANK(Reservations[agent]))),
-							 0
-						 ) * 100,
-					 	 2
-					 ),
+							COALESCE(
+								 DIVIDE([Income], CALCULATE([Income], ALL(), NOT ISBLANK(Reservations[agent]))),
+								 0
+							 ) * 100,
+						 	 2
+					 	),
 			"Effectiveness%", ROUND([Booking Effectivenes %] * 100, 2),
-			"Volume%", ROUND([Booking Volume %] * 100, 2)
+			"Volume%", ROUND(
+							DIVIDE([Reservations], CALCULATE([Reservations], ALL(), NOT ISBLANK(Reservations[agent]))) * 100,
+							3
+						),
+			"Earned Comissions", ROUND([Agent Comissions], 2)
 		)
 		
 	RETURN ADDCOLUMNS(
