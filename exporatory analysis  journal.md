@@ -49,8 +49,27 @@ Added a calculated column called total_rate which represents total amount paid f
 Metrics could be influenced by how long agents have worked for the company. It's not fair to evaluate an agent with 10 reservations achieved in 3 months than another agent with 10 reservations achieved in a year. Unfortunately, we don't have enough information to measure this fact. 
 
 
+## Customer Loyalty exploration
+
+### Problem statement
+    We will be working with a marketing agency, we don't trust the agency yet to share with them our data. Based on your data analysis can you provide a definition of our loyal customers so the team can tweak their segmentations?
+
+Reservations table has some useful variables we can use to formluate a definition of loyalty among our guests. 
+The most relevant variables are `is_repeated_guest`, `previous_bookings_not_cancelled`, `previous_cancellations`.
+To take advantage of such variables, we are going to calculate a couple factors that can help our analysis endevours:
+
+TOTAL BOOKINGS = `previous_bookings_not_cancelled` + `previous_cancellations` + 1
+
+**NOTE** (We add 1 because of the current reservation entry) 
+
+CANCELATION COEFFICIENT = `previous_cancellations` + (1) / TOTAL BOOKINGS
+
+**NOTE** (Add 1 as long as current reservation's `is_canceled` = 1)
+
 ## Other intriguing findings
 
 While I was calculating total income for business, I played around with is_cancelled, deposity_type and reservation_status. I found 47 observations that seem to be incongruent, because they were cancelled , but also has status as Check-out. 
 
 Some bookings end up with $0.00 rate. This is because some of them have 0 reported stay_nights, some others have 0 people (Some corporates), or simply avg_daily_rate is 0.
+
+While I was exploring potential variables to define customer loyalty, I realized that `is_repeated_guest` sometimes has value of 1 (Assuming this means True), but either `previous_bookings_not_cancelled` and `previous_cancellations` have a value of 0. It's reasonable to expect previous booking history (some non cancellation bookings) on reservations marked as repeated guests; however this is not always the case in dataset. 
