@@ -66,6 +66,26 @@ CANCELATION COEFFICIENT = `previous_cancellations` + (1) / TOTAL BOOKINGS
 
 **NOTE** (Add 1 as long as current reservation's `is_canceled` = 1)
 
+## Extra Amenities exploration
+
+### Problem statement
+    We have an hypothesis that customers with babies are more likely to use our extra services (parking, meals etc). can you please validate if that is true?
+
+For this hypothesis exploration, we are going to rely on 2 parameters available in our dataset:
+- `total_special_requests` Extra services a customer may need during staying.
+- `required_car_parking_spaces`. Spaces reserved for a customer
+
+As a complementary study, we are going to get to know better our customers with babies by exploring following variables:
+- `meal` To identify if there's an special preference of meal menu for customers with babies
+- `market_segment` To Identify if customers with babies have a bigger density in certain segments.
+
+I labeled reservations to classify 
+with babies. If at least 1 baby is reported by customer
+without babies. If customers don't bring babies to the hotel
+
+As reservations without babies is vast greater (98.8%) than the ones without babies, then we are going to use rations to make a fair comparison. 
+
+
 ## Other intriguing findings
 
 While I was calculating total income for business, I played around with is_cancelled, deposity_type and reservation_status. I found 47 observations that seem to be incongruent, because they were cancelled , but also has status as Check-out. 
