@@ -1,0 +1,17 @@
+﻿
+EVALUATE
+	SAMPLE(15,
+			SELECTCOLUMNS(CALCULATETABLE(Reservations, Reservations[is_repeated_guest] = 1),
+						Reservations[customer_type],
+						Reservations[is_canceled],
+						Reservations[is_repeated_guest],
+						Reservations[total_bookings],
+						Reservations[previous_bookings_not_canceled],
+						Reservations[previous_cancellations],
+						Reservations[cancelation_coefficient]
+			),
+			RAND()
+	)
+	
+EVALUATE
+	CALCULATETABLE(Reservations, Reservations[previous_bookings_not_canceled] = 1)

@@ -1,0 +1,61 @@
+﻿-- We have an hypothesis that customers with babies are more likely to use our extra services (parking, meals etc).
+-- can you please validate if that is true?
+
+
+-- Reservations with babies
+
+EVALUATE
+	SAMPLE(20,
+			SELECTCOLUMNS(CALCULATETABLE(Reservations, Reservations[babies] >= 1),
+						Reservations[babies],
+						Reservations[total_of_special_requests],
+						Reservations[required_car_parking_spaces],
+						Reservations[market_segment],
+						Reservations[meal]
+						
+			),
+			RAND()
+	)
+	
+-- Reservations without babies
+EVALUATE
+	SAMPLE(20,
+			SELECTCOLUMNS(CALCULATETABLE(Reservations, Reservations[babies] = 0),
+						Reservations[babies],
+						Reservations[total_of_special_requests],
+						Reservations[required_car_parking_spaces],
+						Reservations[market_segment],
+						Reservations[meal]
+						
+			),
+			RAND()
+	)
+	
+-- Visualize reservations segmented by number of babies and see averages
+EVALUATE
+	SUMMARIZECOLUMNS(
+		Reservations[babies],
+		Reservations,
+		"Reservations", COUNT(Reservations[reservation_id]),
+		"Special Requests (Avg)", ROUND(AVERAGE(Reservations[total_of_special_requests]), 2),
+		"Special Requests (Median)", ROUND(MEDIAN(Reservations[total_of_special_requests]), 2),
+		"Special Requests (Sdev)", ROUND(STDEV.P(Reservations[total_of_special_requests]), 2),
+		"Parking Spaces (Avg)", ROUND(AVERAGE(Reservations[required_car_parking_spaces]), 2),
+		"Parking Spaces (Median)", ROUND(MEDIAN(Reservations[required_car_parking_spaces]), 2),
+		"Parking Spaces (Sdev)", ROUND(STDEV.P(Reservations[required_car_parking_spaces]), 2)
+	)
+
+
+-- Binary classification of reservations with babies and without them 
+EVALUATE
+	SUMMARIZECOLUMNS(
+		Reservations[Reservation with babies],
+		Reservations,
+		"Reservations", COUNT(Reservations[reservation_id]),
+		"Special Requests (Avg)", ROUND(AVERAGE(Reservations[total_of_special_requests]), 2),
+		"Special Requests (Median)", ROUND(MEDIAN(Reservations[total_of_special_requests]), 2),
+		"Special Requests (Sdev)", ROUND(STDEV.P(Reservations[total_of_special_requests]), 2),
+		"Parking Spaces (Avg)", ROUND(AVERAGE(Reservations[required_car_parking_spaces]), 2),
+		"Parking Spaces (Median)", ROUND(MEDIAN(Reservations[required_car_parking_spaces]), 2),
+		"Parking Spaces (Sdev)", ROUND(STDEV.P(Reservations[required_car_parking_spaces]), 2)
+	)
