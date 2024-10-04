@@ -1,0 +1,90 @@
+﻿DEFINE
+	VAR dateFilter = FILTER(Reservations, Reservations[arrival_date] = DATE(2020,1,4))
+	
+	
+
+EVALUATE
+	SUMMARIZECOLUMNS(
+		Reservations[reservation_status],
+		CALCULATETABLE(Reservations, dateFilter),
+		"Reservations", [Reservations],
+		"All Status Reservations", CALCULATE([Reservations], REMOVEFILTERS(Reservations[reservation_status])) 
+	)
+	
+EVALUATE
+	{ CALCULATE([Reservations], dateFilter) }
+	
+
+
+-- Just examine bookings in a certain date
+
+EVALUATE
+	SUMMARIZE(
+		CALCULATETABLE(Reservations, DATESBETWEEN(Reservations[booking_date], DATE(2018,09,01), DATE(2018,09,30))),
+		Reservations[booking_date],
+		"Bookings", COUNT(Reservations[booking_date])
+	)
+	
+EVALUATE
+	SUMMARIZE(
+		CALCULATETABLE(Reservations, DATESBETWEEN(Reservations[arrival_date], DATE(2018,09,01), DATE(2018,09,30))),
+		Reservations[arrival_date],
+		"Arrivals", COUNT(Reservations[arrival_date])
+	)
+	
+	
+EVALUATE
+	ROW("Min Arrival", MIN(Reservations[arrival_date]), "Max Arrival", MAX(Reservations[arrival_date])) 
+	
+EVALUATE
+	SUMMARIZE(
+		CALCULATETABLE(Reservations, Reservations[booking_date] = DATE(2017, 10, 17)),
+		Reservations[booking_date],
+		"Bookings", COUNT(Reservations[booking_date])
+	)
+	
+EVALUATE
+	SUMMARIZE(
+		CALCULATETABLE(Reservations, Reservations[arrival_date] = DATE(2017, 10, 17)),
+		Reservations[arrival_date],
+		"Bookings", COUNT(Reservations[arrival_date])
+	)
+
+
+
+// Formula to return max number of bookings within a contrained date filter context (manually specified filter context)
+EVALUATE
+	// Simulate a slicer in UI operating over September - 2019
+	VAR __DS0FilterTable = 
+		TREATAS({("2019", "September")}, 'Calendar'[Year], 'Calendar'[MonthName]) 
+
+	VAR __DS0Core = 
+		SUMMARIZECOLUMNS(
+			'Reservations'[booking_date],
+			__DS0FilterTable,
+			"Bookings_by_Date", 'DAXCalculations'[Bookings by Date]
+		)
+		
+	RETURN { MAXX(SUMMARIZECOLUMNS(
+			'Reservations'[booking_date],
+			__DS0FilterTable,
+			"Bookings_by_Date", 'DAXCalculations'[Bookings by Date]
+		), [Bookings_by_Date]) }
+		
+// Represents a generic Time Intelligence formula to calculate the maximum number of bookings in a given period of time
+// In this case the whole history of dataset. 
+// As date filter context changes, maximum booking will adapt to new period of analysis 
+EVALUATE
+	VAR InitialVisibleDate = MIN('Calendar'[Date])
+	VAR LastVisibleDate = MAX('Calendar'[Date])
+	VAR datesFilter = FILTER(ALL('Calendar'[Date]), AND('Calendar'[Date] >= InitialVisibleDate, 'Calendar'[Date] <= LastVisibleDate))
+	
+	RETURN { MAXX(
+				SUMMARIZECOLUMNS(
+					'Reservations'[booking_date],
+					datesFilter,
+					"Bookings_by_Date", 'DAXCalculations'[Bookings by Date]
+				),
+				[Bookings_by_Date]
+			 ) 
+		   }

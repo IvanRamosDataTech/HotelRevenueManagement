@@ -1,0 +1,113 @@
+﻿DEFINE
+	VAR __DS0FilterTable = 
+		TREATAS({(2018, "QRT 3")}, 'Calendar'[Year], 'Calendar'[Quarter])
+
+	VAR __DS0Core = 
+		SUMMARIZECOLUMNS(
+			'Reservations'[lead_time bins],
+			ROLLUPADDISSUBTOTAL('Reservations'[reservation_status], "IsGrandTotalColumnTotal"),
+			__DS0FilterTable,
+			"DM0_Sort", CALCULATE(
+				DIVIDE(COUNTA('Reservations'[lead_time]), CALCULATE(
+					COUNTA('Reservations'[lead_time]),
+					ALLSELECTED('Reservations'[lead_time bins]),
+					ALLSELECTED('Reservations'[reservation_status])
+				))
+			)
+		)
+
+	VAR __DS0CoreOnlyOutputTotals = 
+		SELECTCOLUMNS(
+			KEEPFILTERS(FILTER(KEEPFILTERS(__DS0Core), [IsGrandTotalColumnTotal] = FALSE)),
+			"'Reservations'[lead_time bins]", 'Reservations'[lead_time bins],
+			"'Reservations'[reservation_status]", 'Reservations'[reservation_status],
+			"DM0_Sort", [DM0_Sort]
+		)
+
+	VAR __DS0CoreTableByDM0 = 
+		SELECTCOLUMNS(
+			KEEPFILTERS(FILTER(KEEPFILTERS(__DS0Core), [IsGrandTotalColumnTotal] = TRUE)),
+			"'Reservations'[lead_time bins]", 'Reservations'[lead_time bins],
+			"SortBy_DM0_0", [DM0_Sort]
+		)
+
+	VAR __DS0PrimaryWithSortColumns = 
+		NATURALLEFTOUTERJOIN(DEFINE VAR __DS0FilterTable = 
+	TREATAS({(2018, "QRT 3")}, 'Calendar'[Year], 'Calendar'[Quarter])
+
+EVALUATE
+	SUMMARIZECOLUMNS(__DS0FilterTable, "Maximum_Bookings", IGNORE('DAXCalculations'[Maximum Bookings]))
+DEFINE
+	VAR __DS0FilterTable = 
+		TREATAS({(2018, "QRT 3")}, 'Calendar'[Year], 'Calendar'[Quarter])
+
+	VAR __DS0Core = 
+		SUMMARIZECOLUMNS(
+			'Reservations'[booking_date],
+			__DS0FilterTable,
+			"Bookings_by_Date", 'DAXCalculations'[Bookings by Date]
+		)
+
+	VAR __DS0IntersectionCount = CALCULATE(COUNTROWS(__DS0Core))
+
+	VAR __DS0BodyBinnedSample = 
+		SAMPLEAXISWITHLOCALMINMAX(
+			3500,
+			__DS0Core,
+			'Reservations'[booking_date],
+			[Bookings_by_Date],
+			350,
+			,
+			ALPHABETICAL,
+			ASC,
+			105000,
+			60
+		)
+
+EVALUATE
+	ROW(
+	"DS0IntersectionCount", __DS0IntersectionCount
+)
+
+EVALUATE
+	__DS0BodyBinnedSample
+
+ORDER BY
+	'Reservations'[booking_date]
+
+			SUMMARIZE(__DS0Core, 'Reservations'[lead_time bins]),
+			__DS0CoreTableByDM0
+		)
+
+	VAR __DS0PrimaryWindowed = 
+		TOPN(201, __DS0PrimaryWithSortColumns, [SortBy_DM0_0], 0, 'Reservations'[lead_time bins], 1)
+
+	VAR __DS0SecondaryBase = 
+		SUMMARIZE(__DS0CoreOnlyOutputTotals, 'Reservations'[reservation_status])
+
+	VAR __DS0Secondary = 
+		TOPN(62, __DS0SecondaryBase, 'Reservations'[reservation_status], 1)
+
+	VAR __DS0BodyLimited = 
+		NATURALLEFTOUTERJOIN(
+			__DS0PrimaryWindowed,
+			SUBSTITUTEWITHINDEX(
+				__DS0CoreOnlyOutputTotals,
+				"ColumnIndex",
+				__DS0Secondary,
+				'Reservations'[reservation_status],
+				ASC
+			)
+		)
+
+EVALUATE
+	__DS0Secondary
+
+ORDER BY
+	'Reservations'[reservation_status]
+
+EVALUATE
+	__DS0BodyLimited
+
+ORDER BY
+	[SortBy_DM0_0] DESC, 'Reservations'[lead_time bins], [ColumnIndex]
