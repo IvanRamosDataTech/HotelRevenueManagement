@@ -85,10 +85,24 @@ without babies. If customers don't bring babies to the hotel
 
 As reservations without babies is vast greater (98.8%) than the ones without babies, then we are going to use rations to make a fair comparison. 
 
+## Time Intelligence Exploration
+    Client is very much interested in Time Analysis exploration (seasonality, festive periods, weekdays vs weekend) I want to know when I have low occupancy.
+    Give me an overview of when I can offer deals (low demand) vs when I can increase prices (high demand)
+
+Some useful fields for this analysis are:
+`arrival_date` - To see effective days of occupancy
+
+`active_reservations` - This measure can help to determine the number of active reservations given an specific date. 
+
+Secondary fields to complement study:
+`lead_time` - Time (in days) in advance a guest made a reservation before arrival
+`is_canceled` - We can use this variable as a filter to classify effective bookings vs lost bookings
+
+Given that 2019 is the only year we have full data, we are going to compare periodos of time vs same period previous year to perform a fair comparison.
 
 ## Other intriguing findings
 
-While I was calculating total income for business, I played around with is_cancelled, deposity_type and reservation_status. I found 47 observations that seem to be incongruent, because they were cancelled , but also has status as Check-out. 
+While I was calculating total income for business, I played around with `is_cancelled`, deposity_type and reservation_status. I found 47 observations that seem to be incongruent, because they were cancelled , but also has status as Check-out. 
 
 Some bookings end up with $0.00 rate. This is because some of them have 0 reported stay_nights, some others have 0 people (Some corporates), or simply avg_daily_rate is 0.
 
